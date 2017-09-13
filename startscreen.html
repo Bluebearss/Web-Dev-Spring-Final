@@ -1,0 +1,255 @@
+<!DOCTYPE HTML>
+<!-- Brian Zhu -->
+<html>
+	<head>
+		<title></title>
+		<style>
+			div#map
+			{
+				color:#b31aff;
+				font-family:elephant;
+				font-size:200%;
+				border:5px solid black;
+				border-radius:12px;
+				margin:auto;
+				background-color:white;
+			}
+			
+			div.usermenu
+			{
+				color:#b31aff;
+				font-family:elephant;
+				font-size:200%;
+				display:none;
+			}
+			
+			div#title
+			{
+				text-align:center;
+			}
+			
+			div#items
+			{
+				text-align:center;
+			}
+			
+			img.section
+			{
+				z-index:-1;
+				width:100%;
+				height:100%;
+				top:0px;
+				left:0px;
+				position:fixed;
+				display:none;
+				opacity:0.8;
+			}
+			
+			img
+			{
+				display:block;
+				width:60%;
+			}
+			
+			img.bigimg
+			{
+				margin-left:auto;
+				margin-right:auto;
+			}
+			img.itemImg
+			{
+				margin:auto;
+				width:10%;
+			}
+			
+			img#smallimg
+			{
+				margin-left:5%;
+				margin-top:10%;
+				width:10%;
+				display:none;
+			}
+			
+			div.buttonsection
+			{
+				padding:5px;
+			}
+			button#sectionflorist,button#sectionproduce,button.sectionhide,button.sectionbulk,button.sectionseafood,button.sectionmeat,button.sectiondairy,button.sectionwine,button.sectionbakery,button.sectiondeli
+			{
+				font-size:100%;
+				display:none;
+			}
+			a
+			{
+				margin-left:40%;
+				font-size:200%;
+				color:green;
+				display:none;
+			}
+		</style>
+		<script>
+			function initialize()
+			{	
+				mapElement = document.getElementById("map");
+				sectionAisle = document.getElementById("imgsection");
+				smallImg = document.getElementById("smallimg");
+				titleName = document.getElementById("title");
+				itemsInSection = document.getElementById("items");
+				mainMenu = document.getElementById("usermenu");
+				cartLink = document.getElementById("cart");
+				
+				floristSectionBtn = document.getElementById("sectionflorist");
+				produceSectionBtn = document.getElementById("sectionproduce");
+				bulkSectionBtn = document.getElementById("sectionbulk");
+				seafoodSectionBtn = document.getElementById("sectionseafood");
+				meatSectionBtn = document.getElementById("sectionmeat");
+				dairySectionBtn = document.getElementById("sectiondairy");
+				wineSectionBtn = document.getElementById("sectionwine");
+				bakerySectionBtn = document.getElementById("sectionbakery");
+				deliSectionBtn = document.getElementById("sectiondeli");
+				buttonArray = [floristSectionBtn,produceSectionBtn,bulkSectionBtn,seafoodSectionBtn,meatSectionBtn,dairySectionBtn,wineSectionBtn,bakerySectionBtn,deliSectionBtn];
+				
+				var request = new XMLHttpRequest();
+				
+				request.onreadystatechange = function()
+				{
+					if (request.readyState == 4)
+					{
+						var itemsList = eval(request.responseText);
+
+						for (i = 0; i < itemsList.length; i++)
+						{
+							console.log(itemsList[i][0]);
+							var newItm = document.createElement("div");
+							var newItmImage = document.createElement("img");
+							var newItmPrice = document.createElement("div");
+							newItmImage.className = "itemImg";
+							newItm.innerHTML = itemsList[i][0];
+							newItmImage.src = "images/" + itemsList[i][0] + ".png";
+							newItmPrice.innerHTML = "$" + itemsList[i][2];
+							newItmImage.setAttribute("onclick", "addCart('" + itemsList[i][0] + "');");
+							itemsInSection.appendChild(newItm);
+							itemsInSection.appendChild(newItmImage);
+							itemsInSection.appendChild(newItmPrice);
+						}
+					}
+				}
+				
+				var url = "florist.php";
+				request.open("GET", url, true);
+				request.send(null);
+			}
+			function hideMap()
+			{
+				mapElement.style.display = "none";
+				sectionAisle.style.display = "block";
+				smallImg.style.display = "block";
+				mainMenu.style.display = "block";
+				cartLink.style.display = "block";
+				for (i = 0; i < buttonArray.length; i++)
+				{
+					buttonArray[i].style.display = "inline-block";
+				}
+			}
+			function enlargeMap()
+			{
+				mapElement.style.display = "block";
+				smallImg.style.display = "none";
+				mainMenu.style.display = "none";
+				cartLink.style.display = "none";
+				for (i = 0; i < buttonArray.length; i++)
+				{
+					buttonArray[i].style.display = "none";
+				}
+			}
+			function updatePage(name)
+			{
+				itemsInSection.innerHTML = "";
+				titleName.innerHTML = "Welcome to the " + name + " Section!";
+				sectionAisle.src = "images/" + name + "section.jpg";
+				
+				var request = new XMLHttpRequest();
+				
+				request.onreadystatechange = function()
+				{
+					if (request.readyState == 4)
+					{
+						var itemsSectionList = eval(request.responseText);
+						
+						for (i = 0; i < itemsSectionList.length; i++)
+						{
+							console.log(itemsSectionList[i][0]);
+							var newItm = document.createElement("div");
+							var newItmImage = document.createElement("img");
+							var newItmPrice = document.createElement("div");
+							newItmImage.className = "itemImg";
+							newItm.innerHTML = itemsSectionList[i][0];
+							newItmImage.src = "images/" + itemsSectionList[i][0] + ".png";
+							newItmPrice.innerHTML = "$" + itemsSectionList[i][2];
+							newItmImage.setAttribute("onclick", "addCart('" + itemsSectionList[i][0] + "');");
+							itemsInSection.appendChild(newItm);
+							itemsInSection.appendChild(newItmImage);
+							itemsInSection.appendChild(newItmPrice);
+						}
+					}
+				}
+				
+				var url = name + ".php";
+				request.open("GET", url, true);
+				request.send(null);
+			}
+			function addCart(item)
+			{
+				console.log(item);
+				var request = new XMLHttpRequest();
+		
+				var url = "addtoCart.php?item=" + item;
+				request.open("GET", url, true);
+				request.send(null);
+			}
+		</script>
+		
+	</head>
+	
+	<body onload = "initialize();">
+		<div id = "map">
+			This is a map of the grocery market. You can view the map again by clicking on the icon.<br />
+			<img class = "bigimg" src = "images/layout.png" />
+			<button onclick = "hideMap();">Click to Close the Map</button>
+		</div>
+		
+		<div id = "usermenu" class = "usermenu">
+			<div id = "title">Welcome to the florist Section!</div>
+
+			<div id = "items">These are the Items in this Section!</div>
+		</div>
+		
+		<img class = "section" id = "imgsection" src = "images/floristsection.jpg" />
+		
+		<img onclick = "enlargeMap();" id = "smallimg" src = "images/layout.png" />
+		
+		<div class = "buttonsection">
+			<button class = "sectionflorist" id = "sectionflorist" onclick = "updatePage('florist');">Click to go to the florist section!</button>
+			
+			<button class = "sectionproduce" id = "sectionproduce" onclick = "updatePage('produce');">Click to go to the produce section!</button>
+			
+			<button class = "sectionbulk" id = "sectionbulk" onclick = "updatePage('bulk');">Click to go to the bulk section!</button>
+			
+			<button class = "sectionseafood" id = "sectionseafood" onclick = "updatePage('seafood');">Click to go to the seafood section!</button>
+			
+			<button class = "sectionmeat" id = "sectionmeat" onclick = "updatePage('meat');">Click to go to the meat section!</button>
+		</div>
+		
+		<div class = "buttonsection">
+			<button class = "sectiondairy" id = "sectiondairy" onclick = "updatePage('dairy');">Click to go to the dairy section!</button>
+			
+			<button class = "sectionwine" id = "sectionwine" onclick = "updatePage('wine');">Click to go to the wine section!</button>
+			
+			<button class = "sectionbakery" id = "sectionbakery" onclick = "updatePage('bakery');">Click to go to the bakery section!</button>
+			
+			<button class = "sectiondeli" id = "sectiondeli" onclick = "updatePage('deli');">Click to go to the deli section!</button>
+		</div>
+		
+		<a id = "cart" href = "cart.html">Take to Cart!</a>
+	</body>
+</html>

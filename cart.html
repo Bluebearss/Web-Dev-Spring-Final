@@ -1,0 +1,59 @@
+<!DOCTYPE HTML>
+<!-- Brian Zhu -->
+<html>
+	<head>
+		<title></title>
+		<style>
+
+		</style>
+		<script>
+			function initialize()
+			{
+				cart = document.getElementById("cart");
+				var request = new XMLHttpRequest();
+				
+				request.onreadystatechange = function()
+				{
+					if (request.readyState == 4)
+					{
+						var itemsList = eval(request.responseText);
+
+						for (i = 0; i < itemsList.length; i++)
+						{
+							var newItm = document.createElement("div");
+							var newItmPrice = document.createElement("div");
+							newItm.innerHTML = itemsList[i][0];
+							newItmPrice.innerHTML = "$" + itemsList[i][1];
+							cart.appendChild(newItm);
+							cart.appendChild(newItmPrice);
+						}
+					}
+				}
+				
+				var url = "incart.php";
+				request.open("GET", url, true);
+				request.send(null);
+			}
+			function purchase()
+			{
+				var request = new XMLHttpRequest();
+				
+				var url = "purchase.php";
+				request.open("GET", url, true);
+				request.send(null);
+			}
+		</script>
+		
+	</head>
+	
+	<body onload = "initialize();">
+		<h1>My Cart</h1>
+		<div id = "cart"></div>
+		
+		<div>
+			<button onclick = "purchase();">Purchase!</button>
+		</div>
+		
+		<a href = "startscreen.html">Take to Home Page!</a>
+	</body>
+</html>
